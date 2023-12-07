@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "lib/pgm.h"
+#include "../lib/pgm.h"
 
 struct Image filtro(struct Image o){
 

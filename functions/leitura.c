@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <time.h>
-#include "lib/pgm.h"
+#include "../lib/pgm.h"
 
 void readPGMImage(struct Image *img, char *filename) {
 
