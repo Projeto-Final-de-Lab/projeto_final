@@ -2,59 +2,45 @@
 #include <stdlib.h>
 #include "../lib/pgm.h"
 
-struct Image filtro(struct Image o){
+float media(struct Image o, int x, int y, int tamanho) {
+    float soma = 0.0;
+    int count = 0;
+    int meio = tamanho / 2;
+
+    for (int i = -meio; i <= meio; i++) {
+        for (int j = -meio; j <= meio; j++) {
+            if (x+i >= 0 && x+i < o.height && y+j >= 0 && y+j < o.width) {
+                soma += o.Data[x+i][y+j];
+                count++;
+            }
+        }
+    }
+
+    return soma / count;
+}
+
+struct Image filtro(struct Image o, int tamanho){
 
     //img será a imagem filtrada, aux será apenas uma estrutura auxiliar para resolver problemas com bordas
-    struct Image img,aux;
+    struct Image new_image;
 
     //Definindo img
-    img.tipo = o.tipo;
-    img.height = o.height;
-    img.width = o.width;
-    img.maxval = o.maxval;
-    if(!(img.Data = (unsigned char **)calloc(img.height,sizeof(unsigned char*)))){
-            printf("Faltou memória.");
-            exit(1);
+    new_image.tipo = o.tipo;
+    new_image.height = o.height;
+    new_image.width = o.width;
+    new_image.maxval = o.maxval;
+
+    // Alocando memória para os dados da imagem
+    new_image.Data = (unsigned char **)malloc(new_image.height * sizeof(unsigned char *));
+    for (int i = 0; i < new_image.height; i++) {
+        new_image.Data[i] = (unsigned char *)malloc(new_image.width * sizeof(unsigned char));
     }
-    for(int i = 0; i<img.height; i++){
-        if(!(img.Data[i] = (unsigned char *)calloc(img.width,sizeof(unsigned char)))){
-            printf("Faltou memória.");
-            exit(1);
-        }
-    }
-    for(int i=0;i<img.height;i++){
-        for(int j=0;j<img.width;j++){
-            img.Data[i][j] = o.Data[i][j];
+
+    for (int i = 0; i < new_image.height; i++) {
+        for (int j = 0; j < new_image.width; j++) {
+            new_image.Data[i][j] = (unsigned char)media(o, i, j, tamanho);
         }
     }
 
-    //Definindo matriz auxiliar
-    aux.height = o.height + 2;
-    aux.width = o.height + 2;
-    if(!(aux.Data = (unsigned char **)calloc(aux.height,sizeof(unsigned char*)))){
-            printf("Faltou memória.");
-            exit(1);
-    }
-    for(int i = 0; i<aux.height; i++){
-        if(!(aux.Data[i] = (unsigned char *)calloc(aux.width,sizeof(unsigned char)))){
-            printf("Faltou memória.");
-            exit(1);
-        }
-    }
-
-    //Colocando o img na auxilar, deixando os espaços das bordas 0.
-    for(int i=0;i<img.height;i++){
-        for(int j=0;j<img.width;j++){
-            aux.Data[i+1][j+1] = img.Data[i][j];
-        }
-    }
-
-    //Definindo a img a partir da auxiliar, de forma que as bordas serão consideradas 0
-    for(int i=0;i<img.height;i++){
-        for(int j=0;j<img.width;j++){
-            img.Data[i][j] = media(aux,i+1,j+1);
-        }
-    }
-
-    return img;
+    return new_image;
 }
