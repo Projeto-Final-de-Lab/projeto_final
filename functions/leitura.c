@@ -4,6 +4,16 @@
 #include <time.h>
 #include "../lib/pgm.h"
 
+void createOutputDirectory() {
+    struct stat st = {0};
+
+    // Verificar se o diretório de saída já existe
+    if (stat(OUTPUT_DIR, &st) == -1) {
+        // Se não existir, criar o diretório
+        mkdir(OUTPUT_DIR, 0700); // 0700: Permissões para o dono (leitura, escrita e execução)
+    }
+}
+
 void readPGMImage(struct Image *img, char *filename) {
 
     FILE *fp;
