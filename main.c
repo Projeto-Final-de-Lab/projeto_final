@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <dirent.h>
+#include "lib/filtro.h"
 #include "lib/pgm.h"
+
+#define DATASETS "./oncotex_mean_pgm_3x3"
 
 int main()
 {
@@ -10,7 +15,7 @@ int main()
     begin = clock();
     DIR *d;
     struct dirent *dir;
-    d = opendir("./images");
+    d = opendir(DATASETS);
     if (d)
     {
         while ((dir = readdir(d)) != NULL)
@@ -19,7 +24,15 @@ int main()
             // removido para evitar poluição na saída
             if(dir->d_name[0] != '.'){
                 begin = clock();
-                printf("%s\n", dir->d_name);
+                char inputFilename[256];
+                char outputFilename[256];
+
+                snprintf(inputFilename, sizeof(inputFilename), "%s/%s", DATASETS, dir->d_name);
+                snprintf(outputFilename, sizeof(outputFilename), "%sfiltered.pgm", dir->d_name);
+
+                applyfilter(inputFilename, outputFilename, 7);
+
+                
 
             }
         }

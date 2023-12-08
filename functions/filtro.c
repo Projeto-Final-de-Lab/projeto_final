@@ -1,46 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include "../lib/pgm.h"
 
-float media(struct Image o, int x, int y, int tamanho) {
-    float soma = 0.0;
-    int count = 0;
-    int meio = tamanho / 2;
+int applyfilter(char *inputFilename, char *outputFilename, int filterSize) {
+    struct Image original, result;
+    int sum;
+    int divisor = filterSize * filterSize;
 
-    for (int i = -meio; i <= meio; i++) {
-        for (int j = -meio; j <= meio; j++) {
-            if (x+i >= 0 && x+i < o.height && y+j >= 0 && y+j < o.width) {
-                soma += o.Data[x+i][y+j];
-                count++;
+    // Load the input PGM image
+    readPGMImage(&original, inputFilename);
+
+    result.width = original.width - filterSize + 1;
+    result.height = original.height - filterSize + 1;
+    result.maxval = original.maxval;
+
+    result.Data = (unsigned char **)malloc(result.height * sizeof(unsigned char *));
+    for (int i = 0; i < result.height; i++) {
+        result.Data[i] = (unsigned char *)malloc(result.width * sizeof(unsigned char));
+    }
+
+    for (int i = 0; i < result.height; i++) {
+        for (int j = 0; j < result.width; j++) {
+            sum = 0;
+
+            for (int x = 0; x < filterSize; x++) {
+                for (int y = 0; y < filterSize; y++) {
+                    sum += original.Data[i + x][j + y];
+                }
             }
+
+            result.Data[i][j] = sum / divisor;
         }
     }
 
-    return soma / count;
-}
+    // Save the filtered image
+    writePGMImage(&result, outputFilename);
 
-struct Image filtro(struct Image o, int tamanho){
-
-    //img será a imagem filtrada, aux será apenas uma estrutura auxiliar para resolver problemas com bordas
-    struct Image new_image;
-
-    //Definindo img
-    new_image.tipo = o.tipo;
-    new_image.height = o.height;
-    new_image.width = o.width;
-    new_image.maxval = o.maxval;
-
-    // Alocando memória para os dados da imagem
-    new_image.Data = (unsigned char **)malloc(new_image.height * sizeof(unsigned char *));
-    for (int i = 0; i < new_image.height; i++) {
-        new_image.Data[i] = (unsigned char *)malloc(new_image.width * sizeof(unsigned char));
-    }
-
-    for (int i = 0; i < new_image.height; i++) {
-        for (int j = 0; j < new_image.width; j++) {
-            new_image.Data[i][j] = (unsigned char)media(o, i, j, tamanho);
-        }
-    }
-
-    return new_image;
+    // Free memory
+    // ...
 }
