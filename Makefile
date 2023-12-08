@@ -1,4 +1,4 @@
-all: prog.e
+all: prog.exe
 
 prog.e: main.o functions/leitura.o functions/filtro.o
 	gcc -o prog.e main.o functions/leitura.o functions/filtro.o

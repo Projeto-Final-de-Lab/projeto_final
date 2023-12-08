@@ -6,6 +6,7 @@
 #include "lib/pgm.h"
 
 #define DATASETS "./oncotex_mean_pgm_3x3"
+#define FILTER_SIZE 3
 
 int main()
 {
@@ -30,7 +31,7 @@ int main()
                 snprintf(inputFilename, sizeof(inputFilename), "%s/%s", DATASETS, dir->d_name);
                 snprintf(outputFilename, sizeof(outputFilename), "%sfiltered.pgm", dir->d_name);
 
-                applyfilter(inputFilename, outputFilename, 7);
+                applyfilter(inputFilename, outputFilename, FILTER_SIZE);
 
                 
 
