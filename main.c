@@ -1,20 +1,45 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <dirent.h>
+#include "lib/filtro.h"
 #include "lib/pgm.h"
 
-int main(int argc, char *argv[]) {
+#define DATASETS "./oncotex_mean_pgm_3x3"
 
-    struct Image img;
-    char *filename = argv[1];
+int main()
+{
+    // Inicio da medição do tempo
+	clock_t begin, end;
+	double time_total=0;
+    begin = clock();
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(DATASETS);
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            //"." e ".." são os diretórios "atual" e "anterior" e foram
+            // removido para evitar poluição na saída
+            if(dir->d_name[0] != '.'){
+                begin = clock();
+                char inputFilename[256];
+                char outputFilename[256];
 
-    readPGMImage(&img, filename);
-    viewPGMImage(&img);
-    printf("Largura: %d\n", img.width);
-    printf("Altura: %d\n", img.height);
-    printf("Valor máximo: %d\n", img.maxval);
-    printf("Tipo: %d\n", img.tipo);
-    printf("Dados: %p\n", img.Data);
-    writePGMImage(&img, "teste.pgm");
+                snprintf(inputFilename, sizeof(inputFilename), "%s/%s", DATASETS, dir->d_name);
+                snprintf(outputFilename, sizeof(outputFilename), "%sfiltered.pgm", dir->d_name);
 
-    return 0;
+                applyfilter(inputFilename, outputFilename, 7);
+
+                
+
+            }
+        }
+        closedir(d);
+    }
+    // Fim da medição do tempo  
+    end = clock();
+    time_total = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Tempo Total: %lf\n",time_total);
 }

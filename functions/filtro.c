@@ -1,60 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include "../lib/pgm.h"
 
-struct Image filtro(struct Image o){
+int applyfilter(char *inputFilename, char *outputFilename, int filterSize) {
+    struct Image original, result;
+    int sum;
+    int divisor = filterSize * filterSize;
 
-    //img será a imagem filtrada, aux será apenas uma estrutura auxiliar para resolver problemas com bordas
-    struct Image img,aux;
+    // Load the input PGM image
+    readPGMImage(&original, inputFilename);
 
-    //Definindo img
-    img.tipo = o.tipo;
-    img.height = o.height;
-    img.width = o.width;
-    img.maxval = o.maxval;
-    if(!(img.Data = (unsigned char **)calloc(img.height,sizeof(unsigned char*)))){
-            printf("Faltou memória.");
-            exit(1);
-    }
-    for(int i = 0; i<img.height; i++){
-        if(!(img.Data[i] = (unsigned char *)calloc(img.width,sizeof(unsigned char)))){
-            printf("Faltou memória.");
-            exit(1);
-        }
-    }
-    for(int i=0;i<img.height;i++){
-        for(int j=0;j<img.width;j++){
-            img.Data[i][j] = o.Data[i][j];
-        }
+    result.width = original.width - filterSize + 1;
+    result.height = original.height - filterSize + 1;
+    result.maxval = original.maxval;
+
+    result.Data = (unsigned char **)malloc(result.height * sizeof(unsigned char *));
+    for (int i = 0; i < result.height; i++) {
+        result.Data[i] = (unsigned char *)malloc(result.width * sizeof(unsigned char));
     }
 
-    //Definindo matriz auxiliar
-    aux.height = o.height + 2;
-    aux.width = o.height + 2;
-    if(!(aux.Data = (unsigned char **)calloc(aux.height,sizeof(unsigned char*)))){
-            printf("Faltou memória.");
-            exit(1);
-    }
-    for(int i = 0; i<aux.height; i++){
-        if(!(aux.Data[i] = (unsigned char *)calloc(aux.width,sizeof(unsigned char)))){
-            printf("Faltou memória.");
-            exit(1);
+    for (int i = 0; i < result.height; i++) {
+        for (int j = 0; j < result.width; j++) {
+            sum = 0;
+
+            for (int x = 0; x < filterSize; x++) {
+                for (int y = 0; y < filterSize; y++) {
+                    sum += original.Data[i + x][j + y];
+                }
+            }
+
+            result.Data[i][j] = sum / divisor;
         }
     }
 
-    //Colocando o img na auxilar, deixando os espaços das bordas 0.
-    for(int i=0;i<img.height;i++){
-        for(int j=0;j<img.width;j++){
-            aux.Data[i+1][j+1] = img.Data[i][j];
-        }
-    }
+    // Save the filtered image
+    writePGMImage(&result, outputFilename);
 
-    //Definindo a img a partir da auxiliar, de forma que as bordas serão consideradas 0
-    for(int i=0;i<img.height;i++){
-        for(int j=0;j<img.width;j++){
-            img.Data[i][j] = media(aux,i+1,j+1);
-        }
-    }
-
-    return img;
+    // Free memory
+    // ...
 }
