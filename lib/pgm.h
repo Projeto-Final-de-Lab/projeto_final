@@ -12,5 +12,6 @@ struct Image {
 void readPGMImage(struct Image *, char *);
 void viewPGMImage(struct Image *);
 void writePGMImage(struct Image *, char *);
+void diretorios();
 
 #endif

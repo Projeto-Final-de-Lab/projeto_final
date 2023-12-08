@@ -3,10 +3,10 @@
 #include <time.h>
 #include <dirent.h>
 #include "lib/filtro.h"
+#include "lib/scm.h"
 #include "lib/pgm.h"
 
 #define DATASETS "./oncotex_mean_pgm_3x3"
-#define FILTER_SIZE 3
 
 int main()
 {
@@ -27,14 +27,13 @@ int main()
                 begin = clock();
                 char inputFilename[256];
                 char outputFilename[256];
+                char outputSuvizada[256];
 
                 snprintf(inputFilename, sizeof(inputFilename), "%s/%s", DATASETS, dir->d_name);
                 snprintf(outputFilename, sizeof(outputFilename), "%sfiltered.pgm", dir->d_name);
 
-                applyfilter(inputFilename, outputFilename, FILTER_SIZE);
-
+                applyfilter(inputFilename, outputFilename, 13);
                 
-
             }
         }
         closedir(d);
