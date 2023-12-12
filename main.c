@@ -7,7 +7,7 @@
 #include "lib/pgm.h"
 
 #define DATASETS "./oncotex_mean_pgm_3x3"
-
+#define OUTPUT "./filtered/"
 int main()
 {
     // Inicio da medição do tempo
@@ -27,16 +27,35 @@ int main()
                 begin = clock();
                 char inputFilename[256];
                 char outputFilename[256];
-                char outputSuvizada[256];
 
                 snprintf(inputFilename, sizeof(inputFilename), "%s/%s", DATASETS, dir->d_name);
-                snprintf(outputFilename, sizeof(outputFilename), "%sfiltered.pgm", dir->d_name);
+                snprintf(outputFilename, sizeof(outputFilename), "%s%sfiltered.pgm",OUTPUT, dir->d_name);
 
-                applyfilter(inputFilename, outputFilename, 13);
+                applyfilter(inputFilename, outputFilename, 3);
+                applyscm(inputFilename, outputFilename, 8);
                 
             }
         }
         closedir(d);
+        DIR *d_output;
+    struct dirent *dir_output;
+    d_output = opendir(OUTPUT);
+    if (d_output)
+    {
+        while ((dir_output = readdir(d_output)) != NULL)
+        {
+            if(dir_output->d_name[0] != '.'){
+                char inputFilename[256];
+                char outputFilename[256];
+
+                snprintf(inputFilename, sizeof(inputFilename), "%s/%s", OUTPUT, dir_output->d_name);
+                snprintf(outputFilename, sizeof(outputFilename), "%s%sfiltered.pgm", OUTPUT, dir_output->d_name);
+
+                applyscm(inputFilename, outputFilename, 8);
+            }
+        }
+        closedir(d_output);
+    }
     }
     // Fim da medição do tempo  
     end = clock();

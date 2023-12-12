@@ -33,10 +33,8 @@ int applyfilter(char *inputFilename, char *outputFilename, int filterSize) {
             result.Data[i][j] = sum / divisor;
         }
     }
-
-    // Save the filtered image
+    
     writePGMImage(&result, outputFilename);
 
-    // Free memory
-    // ...
+    
 }
