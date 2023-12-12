@@ -3,7 +3,7 @@
 #include <time.h>
 #include <dirent.h>
 #include "lib/filtro.h"
-#include "lib/pgm.h"
+#include "lib/leitura.h"
 
 #define DATASETS "./oncotex_pgm"
 #define FILTER_SIZE 3
@@ -33,7 +33,6 @@ int main()
                 struct pgm *img = readPGMFile(inputFilename);
                 filterPGMImage(img, FILTER_SIZE);
                 writePGMFile(outputFilename, img);
-                freePGM(img);
             }
         }
         closedir(d);

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <time.h>
-#include "../lib/pgm.h"
+#include "lib/leitura.h"
 
 
 void readPGMImage(struct pgm *pio, char *filename){
@@ -25,7 +25,7 @@ void readPGMImage(struct pgm *pio, char *filename){
     #elif _WIN32
     fseek(fp,0, SEEK_CUR);
     #endif
-    
+
 	pio->tipo = getc(fp)-48;
 	
 	fseek(fp,1, SEEK_CUR);

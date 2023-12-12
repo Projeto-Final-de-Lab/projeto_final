@@ -1,7 +1,7 @@
 all: prog.exe
 
-prog.e: main.o functions/leitura.o functions/filtro.o
-	gcc -o prog.e main.o functions/leitura.o functions/filtro.o
+prog.exe: main.o functions/leitura.o functions/filtro.o
+	gcc -o prog.exe main.o functions/leitura.o functions/filtro.o
 
 main.o: main.c
 	gcc -o main.o -c main.c
@@ -13,4 +13,4 @@ functions/filtro.o: functions/filtro.c
 	gcc -o functions/filtro.o -c functions/filtro.c
 
 clean:
-	rm -f *.o prog.e functions/*.o
+	rm -f *.o prog.exe functions/*.o
