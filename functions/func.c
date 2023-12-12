@@ -67,14 +67,12 @@ void quantizar(struct Image *img, struct Image *out, int N) {
 }
 
 void encontrarNome(char *nameinput, char *nameoutput){
-  printf("%c\n", nameinput[9]);
-  if(nameinput[9] == '0'){
-    nameoutput = 'epithelium';
+  if(nameinput[0] == '0'){
+    strcpy(nameoutput, "epithelium");
   } else {
-    nameoutput = 'stroma';
+    strcpy(nameoutput, "stroma");
   }
 }
-
 
 int applyscm(struct Image *img, struct Image *qtzd, int N, char *final){
 
