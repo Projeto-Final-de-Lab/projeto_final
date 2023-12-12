@@ -14,13 +14,20 @@
 int main() {
   // Início da medição do tempo
   clock_t inicio = clock();
+
+  FILE *fptr;
+  char *filename = "./program.txt";
+
+  // Abre o arquivo em modo de leitura e escrita, criando-o se ele não existir
+  fptr = fopen(filename,"a+");
+    if (fptr == NULL) {
+      printf("Erro ao abrir o arquivo %s\n", filename);
+      exit(1);
+  }
+
   DIR *d;
-  //DIR *f;
-  struct dirent *dir;
-  //struct dirent *fdir;
-    
+  struct dirent *dir; 
   d = opendir(DATASETS);
-  //f = opendir(OUTPUT);
   if (d)
   {
     while ((dir = readdir(d)) != NULL)
@@ -30,6 +37,7 @@ int main() {
       if(dir->d_name[0] != '.'){
         char inputFilename[256];
         char outputFilename[256];
+        char quantizadaFilename[256];
         //char outputScm[256];
         snprintf(inputFilename, sizeof(inputFilename), "%s/%s", DATASETS, dir->d_name);
         snprintf(outputFilename, sizeof(outputFilename), "%s%sfiltered.pgm", OUTPUT, dir->d_name); 
@@ -44,26 +52,42 @@ int main() {
         writePGMImage(&img_suavizada, outputFilename);
         // Criar uma estrutura pgm para a imagem quantizada
         struct Image img_quantizada;
+
+
         // Quantizar a imagem suavizada em 4 níveis
         quantizar(&img_suavizada, &img_quantizada, 8);
         // Criar uma matriz SCM para a imagem quantizada
+        snprintf(quantizadaFilename, sizeof(quantizadaFilename), "%s%squantizada.pgm", OUTPUT, dir->d_name); 
+        writePGMImage(&img_quantizada, quantizadaFilename);
         int scm[64];
         // Computar a matriz SCM da imagem quantizada
-        computar_scm(&img_quantizada, scm, 8);
+        //computar_scm(&img_quantizada, scm, 8);
         // Imprimir a matriz SCM na tela
-        imprimir_scm(scm, 8);
+        //imprimir_scm(scm, 8);
+
+        //applyscm(&img_suavizada, &img_quantizada, 8);
         // Liberar a memória alocada para as imagens
+
+        unsigned char *scmMatrix;
+        scmMatrix = computeSCM(&img_suavizada, &img_quantizada, 8);
+
+        fprintSCM(fptr, scmMatrix, 8);
+
+        // Escreve stroma ou epithelium, 1,0 respectivamente
+	      // extractLabelSCM(fptr, entry->d_name);
+
+
         free(img.Data);
         free(img_suavizada.Data);
         free(img_quantizada.Data);
+        free(scmMatrix);
 
        }
     }
       closedir(d);
-      //closedir(f);
     }
   
-
+  fclose(fptr);
   // Fim da medição do tempo
   clock_t fim = clock();
   // Calcular o tempo decorrido em segundos

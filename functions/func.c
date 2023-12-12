@@ -6,33 +6,33 @@
 
 
 
-void filterPGMImage(struct Image *img, int matrixSize) {
-    int height = img->height;
-    int width = img->width;
-    unsigned char *newData = (unsigned char*) malloc(height * width * sizeof(unsigned char));
-    int count = 0;
+// void filterPGMImage(struct Image *img, int matrixSize) {
+//     int height = img->height;
+//     int width = img->width;
+//     unsigned char *newData = (unsigned char*) malloc(height * width * sizeof(unsigned char));
+//     int count = 0;
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            count = 0;
-            int sum = 0;
-            for (int m = -matrixSize/2; m <= matrixSize/2; m++) {
-                for (int n = -matrixSize/2; n <= matrixSize/2; n++) {
-                    int y = i + m;
-                    int x = j + n;
-                    if (y >= 0 && y < height && x >= 0 && x < width) {
-                        count++;
-                        sum += img->Data[y * width + x];
-                    }
-                }
-            }
-            newData[i * width + j] = sum / count;
-        }
-    }
+//     for (int i = 0; i < height; i++) {
+//         for (int j = 0; j < width; j++) {
+//             count = 0;
+//             int sum = 0;
+//             for (int m = -matrixSize/2; m <= matrixSize/2; m++) {
+//                 for (int n = -matrixSize/2; n <= matrixSize/2; n++) {
+//                     int y = i + m;
+//                     int x = j + n;
+//                     if (y >= 0 && y < height && x >= 0 && x < width) {
+//                         count++;
+//                         sum += img->Data[y * width + x];
+//                     }
+//                 }
+//             }
+//             newData[i * width + j] = sum / count;
+//         }
+//     }
 
-    free(img->Data);
-    img->Data = newData;
-}
+//     free(img->Data);
+//     img->Data = newData;
+// }
 
 
 void filtro_media(struct Image *img, struct Image *out, int n) {
@@ -142,3 +142,67 @@ void imprimir_scm(int *scm, int N) {
   }
 }
 
+int applyscm(struct Image *img, struct Image *qtzd, int N){
+
+  FILE *fptr;
+  char *filename = "./program.txt";
+
+  // Abre o arquivo em modo de escrita, criando-o se ele não existir
+  fptr = fopen(filename, "a+");
+  if (fptr == NULL) {
+    printf("Erro ao abrir o arquivo %s\n", filename);
+    exit(1);
+  }
+
+
+  int sum[N * N];
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      sum[i * N + j] = 0;
+      for (int k = 0; k < img->height; k++) {
+        for (int l = 0; l < img->width; l++) {
+          if ((img->Data[(i + k) * img->width + (j + l)] == i) && (qtzd->Data[(i + k) * qtzd->width + (j + l)] == j)) {
+            sum[i * N + j]++;
+          }
+        }
+      }
+    }
+  }
+
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+      fprintf(fptr, "%d, ", sum[i * N + j]);
+    }
+  }
+  fprintf(fptr, "\n");
+
+  // Fecha o arquivo
+  fclose(fptr);
+}
+
+
+unsigned char *computeSCM(struct Image *img, struct Image *out, int levels) {
+
+    // Aloca ponteiro para os dados
+    unsigned char *scmMatrix = (unsigned char *)calloc((levels) * (levels), sizeof(unsigned char));
+    if (scmMatrix == NULL) return 0;
+
+    // Utiliza os valores de ambos os dados como index da matriz (Data1[i], Data2[i])
+    for (int i = 0; i < img->height; i++) {
+        for (int j = 0; j < img->width; j++) {
+            scmMatrix[img->Data[i * img->width + j] * (levels) + out->Data[i * img->width + j]]++;
+        }
+    }
+
+    return scmMatrix;
+}
+
+void fprintSCM(FILE *file, unsigned char *scmMatrix, int quantizationLevels) {
+
+    // Printa cada um dos valores dos dados da SCM
+    for (int i = 0; i < quantizationLevels; i++) {
+        for (int j = 0; j < quantizationLevels; j++) {
+            fprintf(file, "%d, ", scmMatrix[i * (quantizationLevels) + j]);
+        }
+    }
+}
