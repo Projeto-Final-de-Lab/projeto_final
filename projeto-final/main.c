@@ -40,22 +40,22 @@ int main() {
         // Criar uma estrutura pgm para a imagem suavizada
         struct Image img_suavizada;
         // Aplicar o filtro da média com janela 3x3 na imagem original
-        filtro_media(&img, &img_suavizada, 13);
+        filtro_media(&img, &img_suavizada, 7);
         writePGMImage(&img_suavizada, outputFilename);
-        // // Criar uma estrutura pgm para a imagem quantizada
-        // struct Image img_quantizada;
-        // // Quantizar a imagem suavizada em 4 níveis
-        // quantizar(&img_suavizada, &img_quantizada, 4);
-        // // Criar uma matriz SCM para a imagem quantizada
-        // int scm[16];
-        // // Computar a matriz SCM da imagem quantizada
-        // computar_scm(&img_quantizada, scm, 4);
-        // // Imprimir a matriz SCM na tela
-        // imprimir_scm(scm, 4);
-        // // Liberar a memória alocada para as imagens
+        // Criar uma estrutura pgm para a imagem quantizada
+        struct Image img_quantizada;
+        // Quantizar a imagem suavizada em 4 níveis
+        quantizar(&img_suavizada, &img_quantizada, 8);
+        // Criar uma matriz SCM para a imagem quantizada
+        int scm[64];
+        // Computar a matriz SCM da imagem quantizada
+        computar_scm(&img_quantizada, scm, 8);
+        // Imprimir a matriz SCM na tela
+        imprimir_scm(scm, 8);
+        // Liberar a memória alocada para as imagens
         free(img.Data);
-        // free(img_suavizada.Data);
-        // free(img_quantizada.Data);
+        free(img_suavizada.Data);
+        free(img_quantizada.Data);
 
        }
     }
