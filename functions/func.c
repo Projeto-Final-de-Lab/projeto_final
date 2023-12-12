@@ -4,7 +4,6 @@
 #include <string.h>
 #include "../lib/pgm.h"
 
-
 void filtro_media(struct Image *img, struct Image *out, int n) {
   // Verificar se os ponteiros são válidos
 
@@ -135,9 +134,6 @@ int applyscm(struct Image *img, struct Image *qtzd, int N, char *final){
   free(scm);
 }
 
-
-
-
 unsigned char *computeSCM(unsigned char *Data1, unsigned char *Data2, int columns, int rows, int levels) {
 
     // Aloca ponteiro para os dados
@@ -162,4 +158,14 @@ void fprintSCM(FILE *file, unsigned char *scmMatrix, int quantizationLevels) {
             fprintf(file, "%d, ", scmMatrix[i * (quantizationLevels) + j]);
         }
     }
+}
+
+void writeCSVHeader(FILE *file, int quantizationLevels) {
+    // Escreve a primeira linha do arquivo CSV com a contagem de 0 até nivel*nivel
+    for (int i = 0; i < quantizationLevels; i++) {
+        for (int j = 0; j < quantizationLevels; j++) {
+            fprintf(file, "%d, ", i * quantizationLevels + j);
+        }
+    }
+    fprintf(file, "\n");
 }
