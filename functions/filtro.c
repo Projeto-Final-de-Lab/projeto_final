@@ -3,40 +3,31 @@
 #include <dirent.h>
 #include "../lib/pgm.h"
 
-int applyfilter(char *inputFilename, char *outputFilename, int filterSize) {
-    struct Image original, result;
-    int sum;
-    int divisor = filterSize * filterSize;
+void filterPGMImage(struct pgm *img, int matrixSize) {
+    int height = img->r;
+    int width = img->c;
+    unsigned char *newData = (unsigned char*) malloc(height * width * sizeof(unsigned char));
+    int count = 0;
 
-    // Load the input PGM image
-    readPGMImage(&original, inputFilename);
-
-    result.width = original.width - filterSize + 1;
-    result.height = original.height - filterSize + 1;
-    result.maxval = original.maxval;
-
-    result.Data = (unsigned char **)malloc(result.height * sizeof(unsigned char *));
-    for (int i = 0; i < result.height; i++) {
-        result.Data[i] = (unsigned char *)malloc(result.width * sizeof(unsigned char));
-    }
-
-    for (int i = 0; i < result.height; i++) {
-        for (int j = 0; j < result.width; j++) {
-            sum = 0;
-
-            for (int x = 0; x < filterSize; x++) {
-                for (int y = 0; y < filterSize; y++) {
-                    sum += original.Data[i + x][j + y];
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            count = 0;
+            int sum = 0;
+            for (int m = -matrixSize/2; m <= matrixSize/2; m++) {
+                for (int n = -matrixSize/2; n <= matrixSize/2; n++) {
+                    int y = i + m;
+                    int x = j + n;
+                    if (y >= 0 && y < height && x >= 0 && x < width) {
+                        count++;
+                        sum += img->pData[y * width + x];
+                    }
                 }
             }
-
-            result.Data[i][j] = sum / divisor;
+            newData[i * width + j] = sum / count;
         }
     }
 
-    // Save the filtered image
-    writePGMImage(&result, outputFilename);
-
-    // Free memory
-    // ...
+    free(img->pData);
+    img->pData = newData;
 }
+
