@@ -5,100 +5,94 @@
 #include "../lib/pgm.h"
 
 
-void readPGMImage(struct Image *img, char *filename) {
+void readPGMImage(struct pgm *pio, char *filename){
 
-    FILE *fp;
-    char ch;
+	FILE *fp;
+	char ch;
 
-    if (!(fp = fopen(filename, "r"))) {
-        perror("Erro.");
-        exit(1);
-    }
+	if (!(fp = fopen(filename,"r"))){
+		perror("Erro.");
+		exit(1);
+	}
 
-    if ((ch = getc(fp)) != 'P') {
-        puts("A imagem fornecida não está no formato pgm");
-        exit(2);
-    }
-
-    img->tipo = getc(fp) - 48;
-
+	if ( (ch = getc(fp))!='P'){
+		puts("A imagem fornecida não está no formato pgm");
+		exit(2);
+	}
+	
     #ifdef __linux__
     fseek(fp,1, SEEK_CUR);
     #elif _WIN32
     fseek(fp,0, SEEK_CUR);
     #endif
+    
+	pio->tipo = getc(fp)-48;
+	
+	fseek(fp,1, SEEK_CUR);
 
-    while ((ch = getc(fp)) == '#') {
-        while ((ch = getc(fp)) != '\n');
-    }
+	while((ch=getc(fp))=='#'){
+		while( (ch=getc(fp))!='\n');
+	}
 
-    fseek(fp, -1, SEEK_CUR);
+	fseek(fp,-1, SEEK_CUR);
 
-    fscanf(fp, "%d %d", &img->width, &img->height);
-    if (ferror(fp)) {
-        perror(NULL);
-        exit(3);
-    }
-    fscanf(fp, "%d", &img->maxval);
-    fseek(fp, 1, SEEK_CUR);
+	fscanf(fp, "%d %d",&pio->c,&pio->r);
+	if (ferror(fp)){ 
+		perror(NULL);
+		exit(3);
+	}	
+	fscanf(fp, "%d",&pio->mv);
+	fseek(fp,1, SEEK_CUR);
 
-    img->Data = (unsigned char **)malloc(img->height * sizeof(unsigned char *));
-    for (int i = 0; i < img->height; i++) {
-        img->Data[i] = (unsigned char *)malloc(img->width * sizeof(unsigned char));
-    }
+	pio->pData = (unsigned char*) malloc(pio->r * pio->c * sizeof(unsigned char));
 
-    switch (img->tipo) {
-        case 2:
-            puts("Lendo imagem PGM (dados em texto)");
-            for (int i = 0; i < img->height; i++) {
-                for (int j = 0; j < img->width; j++) {
-                    fscanf(fp, "%hhu", &img->Data[i][j]);
-                }
-            }
-            break;
-        case 5:
-            puts("Lendo imagem PGM (dados em binário)");
-            for (int i = 0; i < img->height; i++) {
-                fread(img->Data[i], sizeof(unsigned char), img->width, fp);
-            }
-            break;
-        default:
-            puts("Não está implementado");
-    }
-
-    fclose(fp);
+	switch(pio->tipo){
+		case 2:
+			puts("Lendo imagem PGM (dados em texto)");
+			for (int k=0; k < (pio->r * pio->c); k++){
+				fscanf(fp, "%hhu", pio->pData+k);
+			}
+		break;	
+		case 5:
+			puts("Lendo imagem PGM (dados em binário)");
+			fread(pio->pData,sizeof(unsigned char),pio->r * pio->c, fp);
+		break;
+		default:
+			puts("Não está implementado");
+	}
+	
+	fclose(fp);
 
 }
 
-void writePGMImage(struct Image *img, char *filename) {
-    FILE *fp;
+void writePGMImage(struct pgm *pio, char *filename){
+	FILE *fp;
+	char ch;
 
-    if (!(fp = fopen(filename, "wb"))) {
-        perror("Erro.");
-        exit(1);
-    }
+	if (!(fp = fopen(filename,"wb"))){
+		perror("Erro.");
+		exit(1);
+	}
 
-    fprintf(fp, "%s\n", "P5");
-    fprintf(fp, "%d %d\n", img->width, img->height);
-    fprintf(fp, "%d\n", 255);
+	fprintf(fp, "%s\n","P5");
+	fprintf(fp, "%d %d\n",pio->c, pio->r);
+	fprintf(fp, "%d\n", 255);
 
-    for (int i = 0; i < img->height; i++) {
-        fwrite(img->Data[i], sizeof(unsigned char), img->width, fp);
-    }
+	fwrite(pio->pData, sizeof(unsigned char),pio->c * pio->r, fp);
 
-    fclose(fp);
+	fclose(fp);
 
 }
 
-void viewPGMImage(struct Image *img) {
-    printf("Tipo: %d\n", img->tipo);
-    printf("Dimensões: [%d %d]\n", img->width, img->height);
-    printf("Max: %d\n", img->maxval);
 
-    for (int i = 0; i < img->height; i++) {
-        for (int j = 0; j < img->width; j++) {
-            printf("%3d ", img->Data[i][j]);
-        }
-        printf("\n");
-    }
+void viewPGMImage(struct pgm *pio){
+	printf("Tipo: %d\n",pio->tipo);
+	printf("Dimensões: [%d %d]\n",pio->c, pio->r);
+	printf("Max: %d\n",pio->mv);
+
+	for (int k=0; k < (pio->r * pio->c); k++){
+		if (!( k % pio->c)) printf("\n");
+		printf("%2hhu ",*(pio->pData+k));
+	}	
+	printf("\n");
 }

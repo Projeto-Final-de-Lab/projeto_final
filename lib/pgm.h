@@ -1,18 +1,15 @@
-#ifndef PGM_H
-#define PGM_H
+
 #define OUTPUT_DIR "./filtered_images"
 
-struct Image {
-    int tipo;
-    int width;
-    int height;
-    int maxval;
-    unsigned char **Data;
+struct pgm{
+	int tipo;
+	int c;
+	int r;
+	int mv;
+	unsigned char *pData;
 };
 
-void readPGMImage(struct Image *, char *);
-void viewPGMImage(struct Image *);
-void writePGMImage(struct Image *, char *);
-void createOutputDirectory();
+void readPGMImage(struct pgm *, char *);
+void viewPGMImage(struct pgm *);
+void writePGMImage(struct pgm *, char *);
 
-#endif

@@ -1,3 +1,3 @@
 #include "../lib/pgm.h"
 
-int applyfilter(char *inputFilename, char *outputFilename, int filterSize);
+void filterPGMImage(struct pgm *img, int matrixSize);
