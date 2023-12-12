@@ -5,36 +5,6 @@
 #include "../lib/pgm.h"
 
 
-
-// void filterPGMImage(struct Image *img, int matrixSize) {
-//     int height = img->height;
-//     int width = img->width;
-//     unsigned char *newData = (unsigned char*) malloc(height * width * sizeof(unsigned char));
-//     int count = 0;
-
-//     for (int i = 0; i < height; i++) {
-//         for (int j = 0; j < width; j++) {
-//             count = 0;
-//             int sum = 0;
-//             for (int m = -matrixSize/2; m <= matrixSize/2; m++) {
-//                 for (int n = -matrixSize/2; n <= matrixSize/2; n++) {
-//                     int y = i + m;
-//                     int x = j + n;
-//                     if (y >= 0 && y < height && x >= 0 && x < width) {
-//                         count++;
-//                         sum += img->Data[y * width + x];
-//                     }
-//                 }
-//             }
-//             newData[i * width + j] = sum / count;
-//         }
-//     }
-
-//     free(img->Data);
-//     img->Data = newData;
-// }
-
-
 void filtro_media(struct Image *img, struct Image *out, int n) {
   // Verificar se os ponteiros são válidos
 
@@ -96,56 +66,20 @@ void quantizar(struct Image *img, struct Image *out, int N) {
   }
 }
 
-// Função para computar a matriz SCM de uma imagem PGM
-// Parâmetros: img - ponteiro para a estrutura pgm da imagem
-//             scm - ponteiro para a matriz SCM
-//             N - número de níveis de quantização
-void computar_scm(struct Image *img, int *scm, int N) {
-  // Inicializar a matriz SCM com zeros
-  for (int i = 0; i < N * N; i++) {
-    scm[i] = 0;
-  }
-  // Percorrer os pixels da imagem, ignorando as bordas
-  for (int i = 1; i < img->height - 1; i++) {
-    for (int j = 1; j < img->width - 1; j++) {
-      // Obter o valor do pixel na imagem
-      int valor = img->Data[i * img->width + j];
-      // Calcular o nível de quantização correspondente
-      int nivel = valor / ((img->maxval + 1) / N);
-      // Percorrer os quatro vizinhos do pixel (cima, baixo, esquerda, direita)
-      for (int k = -1; k <= 1; k += 2) {
-        for (int l = -1; l <= 1; l += 2) {
-          // Obter o valor do vizinho na imagem
-          int vizinho = img->Data[(i + k) * img->width + (j + l)];
-          // Calcular o nível de quantização correspondente
-          int nivel_vizinho = vizinho / ((img->maxval + 1) / N);
-          // Incrementar o elemento da matriz SCM correspondente ao par de níveis
-          scm[nivel * N + nivel_vizinho]++;
-        }
-      }
-    }
+void encontrarNome(char *nameinput, char *nameoutput){
+  printf("%c\n", nameinput[9]);
+  if(nameinput[9] == '0'){
+    nameoutput = 'epithelium';
+  } else {
+    nameoutput = 'stroma';
   }
 }
 
-// Função para imprimir a matriz SCM na tela
-// Parâmetros: scm - ponteiro para a matriz SCM
-//             N - número de níveis de quantização
-void imprimir_scm(int *scm, int N) {
-  // Percorrer os elementos da matriz SCM
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      // Imprimir o elemento na tela, separado por um espaço
-      printf("%d ", scm[i * N + j]);
-    }
-    // Imprimir uma quebra de linha após cada linha da matriz
-    printf("\n");
-  }
-}
 
-int applyscm(struct Image *img, struct Image *qtzd, int N){
+int applyscm(struct Image *img, struct Image *qtzd, int N, char *final){
 
   FILE *fptr;
-  char *filename = "./program.txt";
+  char *filename = "./program.csv";
 
   // Abre o arquivo em modo de escrita, criando-o se ele não existir
   fptr = fopen(filename, "a+");
@@ -154,43 +88,68 @@ int applyscm(struct Image *img, struct Image *qtzd, int N){
     exit(1);
   }
 
+  // Verifica se os tamanhos das imagens são iguais
+  if (img->height != qtzd->height || img->width != qtzd->width) {
+    printf("Erro: as imagens devem ter o mesmo tamanho\n");
+    exit(1);
+  }
 
-  int sum[N * N];
+  // Aloca memória para a matriz scm de tamanho N x N
+  int **scm = malloc(N * sizeof(int *));
+  if (scm == NULL) {
+    printf("Erro ao alocar memória para a matriz scm\n");
+    exit(1);
+  }
   for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      sum[i * N + j] = 0;
-      for (int k = 0; k < img->height; k++) {
-        for (int l = 0; l < img->width; l++) {
-          if ((img->Data[(i + k) * img->width + (j + l)] == i) && (qtzd->Data[(i + k) * qtzd->width + (j + l)] == j)) {
-            sum[i * N + j]++;
-          }
+    scm[i] = calloc(N, sizeof(int));
+    if (scm[i] == NULL) {
+      printf("Erro ao alocar memória para a matriz scm\n");
+      exit(1);
+    }
+  }
+
+  // Calcula a matriz scm a partir dos valores dos pixels das imagens
+  for(int i = 0; i < img->height; i++) {
+        for (int j = 0; j < img->width; j++) {
+            // Normaliza os valores dos pixels para o intervalo [0, N-1]
+            int x = img->Data[i * img->width + j] * (N - 1) / 255;
+            int y = qtzd->Data[i * qtzd->width + j] * (N - 1) / 255;
+            // Incrementa a frequência do par (x, y) na matriz scm
+            scm[x][y]++;
         }
-      }
-    }
   }
 
+  // Escreve a matriz scm no arquivo separado por vírgulas
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      fprintf(fptr, "%d, ", sum[i * N + j]);
+      fprintf(fptr, "%d, ", scm[i][j]);
     }
   }
-  fprintf(fptr, "\n");
+  fprintf(fptr, "%s\n", final);
 
   // Fecha o arquivo
   fclose(fptr);
+
+  // Libera a memória da matriz scm
+  for (int i = 0; i < N; i++) {
+    free(scm[i]);
+  }
+  free(scm);
 }
 
 
-unsigned char *computeSCM(struct Image *img, struct Image *out, int levels) {
+
+
+unsigned char *computeSCM(unsigned char *Data1, unsigned char *Data2, int columns, int rows, int levels) {
 
     // Aloca ponteiro para os dados
     unsigned char *scmMatrix = (unsigned char *)calloc((levels) * (levels), sizeof(unsigned char));
     if (scmMatrix == NULL) return 0;
 
     // Utiliza os valores de ambos os dados como index da matriz (Data1[i], Data2[i])
-    for (int i = 0; i < img->height; i++) {
-        for (int j = 0; j < img->width; j++) {
-            scmMatrix[img->Data[i * img->width + j] * (levels) + out->Data[i * img->width + j]]++;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            scmMatrix[Data1[i * columns + j] * (levels) + Data2[i * columns + j]]++;
         }
     }
 
