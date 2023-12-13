@@ -6,6 +6,21 @@
 #include "lib/func.h"
 #include "lib/pgm.h"
 
+/*************************************************************/
+/* Aluno 01: Luiz Henrique Teixeira Viana                    */
+/* Matricula: 20231045050556                                 */
+/*                                                           */
+/* Aluno 02: Cleiton Martins Portela                         */
+/* Matricula: 20231045050432                                 */
+/*                                                           */
+/* Aluno 03: José Ruan Rodrigues da Silva                    */
+/* Matricula: 20231045050475                                 */
+/*                                                           */
+/* Avaliação 04: Trabalho Final                              */
+/* 04.505.23 - 2023.2 - Prof. Daniel Ferreira                */
+/* Compilador: gcc.exe (Rev7, Built by MSYS2 project) 13.1.0 */
+/*************************************************************/
+
 #define MAX 256
 #define DATASETS "./images"
 #define OUTPUT "./filtradas/"
