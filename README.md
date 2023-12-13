@@ -38,3 +38,19 @@ A variável r é o raio da janela do filtro, e n é o tamanho total da janela. S
 A intenção é percorrer todos os pixels dentro dessa janela. Para fazer isso, o loop interno vai de -r até r tanto em relação às linhas quanto às colunas. A escolha de iniciar em -r é para garantir que a posição central da janela seja incluída.
 
 ![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/3edae21e-859a-4961-9a06-64ba2f0cbf88)
+
+## Quantização da Imagem
+
+int intervalo = (img->maxval + 1) / N;: Calcula o intervalo de cada nível de quantização. O valor máximo da intensidade de cor (maxval) mais 1 é dividido pelo número de níveis (N) para determinar o intervalo.
+
+Os próximos dois loops aninhados (for e for) percorrem cada pixel da imagem original.
+
+int valor = img->Data[i * img->width + j];: Obtém o valor do pixel na imagem original.
+
+int nivel = valor / intervalo;: Calcula o nível de quantização correspondente dividindo o valor do pixel pelo intervalo.
+
+out->Data[i * out->width + j] = nivel * intervalo + intervalo / 2;: Atribui o valor médio do intervalo ao pixel correspondente na imagem quantizada. Isso é feito para evitar que todos os pixels tenham o mesmo valor, o que resultaria em uma imagem com menos variação visual. O valor médio é calculado multiplicando o nível de quantização pelo intervalo e adicionando metade do intervalo.
+
+Em resumo, essa função quantiza os valores de intensidade de cor da imagem original para reduzir o número de níveis de intensidade para um número especificado (N). Isso pode ser útil para reduzir a complexidade da imagem e economizar espaço de armazenamento.
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/0646a356-797c-4e22-a2e4-25a4a0a01bc7)
+
