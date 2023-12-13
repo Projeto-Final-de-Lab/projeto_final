@@ -8,6 +8,7 @@
    * [Filtro da média](#Filtro_da_média)
    * [Quantização das imagens](#Quantização_das_imagens)
    * [SCM](#SCM)
+   * [Testes](#Teste_de_Imagens)
 <!--te-->
 
 
@@ -53,4 +54,43 @@ out->Data[i * out->width + j] = nivel * intervalo + intervalo / 2;: Atribui o va
 
 Em resumo, essa função quantiza os valores de intensidade de cor da imagem original para reduzir o número de níveis de intensidade para um número especificado (N). Isso pode ser útil para reduzir a complexidade da imagem e economizar espaço de armazenamento.
 ![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/0646a356-797c-4e22-a2e4-25a4a0a01bc7)
+
+
+
+## Testes
+
+
+SCM 8x8 e Fltro da media 3x3
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/9bf8b6ee-494b-4985-8a4d-453406849da4)
+
+
+SCM 8x8 e Fltro da media 5x5
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/0396ba47-8df5-4fc1-99c6-162d6765ed50)
+
+SCM 8x8 e Fltro da media 5x5
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/b460fd9c-20f6-4e05-8a4c-4c75ad6b2f89)
+
+SCM 16x16 e Fltro da media 3x3
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/96285870-e402-488d-86e4-581b7dde02b8)
+
+SCM 16x16 e Fltro da media 5x5
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/0f300909-0166-4a85-834c-d3af6285940f)
+
+SCM 16x16 e Fltro da media 7x7
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/22f4696d-7eee-474d-9fd9-f6e2547e9619)
+
+
+
+
+
+
+
+
+
 
