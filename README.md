@@ -55,6 +55,33 @@ out->Data[i * out->width + j] = nivel * intervalo + intervalo / 2;: Atribui o va
 Em resumo, essa função quantiza os valores de intensidade de cor da imagem original para reduzir o número de níveis de intensidade para um número especificado (N). Isso pode ser útil para reduzir a complexidade da imagem e economizar espaço de armazenamento.
 ![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/0646a356-797c-4e22-a2e4-25a4a0a01bc7)
 
+##  Computação da Matriz SCM
+
+int applyscm(struct Image *img, struct Image *qtzd, int N, char *final, FILE *fptr);
+Recebe como parâmetro uma variável de ponteiro para duas structs, img para receber a imagem original quantizada e qtzd a quantizada com filtro, o N níveis da SCM, uma variável ponteiro do tipo char da função encontrarNome, que recebe o nome do arquivo e determinar se vai ser epithelium(0) ou stroma(1) pelo o primeiro valor do arquivo. Também recebe a variável de ponteiro de arquivo fptr para fazer a escrita dos dados.
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/9c86ca9a-b4bf-41fe-a0fa-939ba0daa166)
+
+
+Aloca a matriz **scm usando o maloc com um tamanho de NxN para ser a matriz SCM
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/bd1f3ea2-1533-44e8-8360-59d10c5d6674)
+
+Faz alocação do vetor da matriz scm usando calloc que zera todo o espaço locado inicialmente para ela começar em 0
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/7a6ac137-d9f8-4b81-a880-96562facbf4b)
+
+
+
+Pecorre os pixel imagens usando dois laços for pelos os tamanhos da linha(height) e coluna(width). Incrementa a frequência dos pares (x, y) na matriz scm com a variável x recebendo o valor de data(pixel) na posição da linha i e coluna j da imagem original quantizada, multiplicando por (N-1)/255 para definir o intervalo entre 0 e N-1 até o valor máximo de cada pixel, fazendo essa divisão para esses valores serem transformados para a correspondência de nível da matriz scm. Da mesma forma para a variável y que é para a imagem filtrada quantizada.
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/4a9b4d20-03a0-4dbe-943c-dbbdf951b01d)
+
+
+Pecorre a matriz scm com dois laços for para imprimir no arquivo de csv os valores da linha e coluna que foram incrementados, separando por vírgulas e espaço e por fim acrescenta no csv o valor final de epithelium ou stroma
+
+![image](https://github.com/Projeto-Final-de-Lab/projeto_final/assets/109428692/2df201f6-ed5f-4305-80b4-291c41b2b2ce)
+
 
 
 ## Testes
