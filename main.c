@@ -32,20 +32,15 @@ int main(int argc, char *argv[]) {
   }
 
   char inputCSV[20];
-  strcpy(inputCSV, "./");
-  strcat(inputCSV, argv[1]);
-  strcat(inputCSV, "x");
-  strcat(inputCSV, argv[1]);
-  strcat(inputCSV, "_");
-  strcat(inputCSV, argv[2]);
-  strcat(inputCSV, ".csv");
+  sprintf(inputCSV, "./%sx%s_%s.csv", argv[1], argv[1], argv[2]);
 
-  FILE *fptr;
+
+  FILE *csv;
   char *filename = inputCSV;
 
   // Abre o arquivo em modo de escrita, criando-o se ele não existir
-  fptr = fopen(filename, "a+");
-  if (fptr == NULL) {
+  csv = fopen(filename, "a+");
+  if (csv == NULL) {
     printf("Erro ao abrir o arquivo %s\n", filename);
     exit(1);
   }
@@ -59,7 +54,7 @@ int main(int argc, char *argv[]) {
   struct dirent *dir; 
   d = opendir(DATASETS);
 
-  writeCSVHeader(fptr, TAM_SCM);
+  writeCSVHeader(csv, TAM_SCM);
 
   if (d)
   {
@@ -73,8 +68,8 @@ int main(int argc, char *argv[]) {
         snprintf(inputFilename, sizeof(inputFilename), "%s/%s", DATASETS, dir->d_name);
         snprintf(outputFilename, sizeof(outputFilename), "%s%sfiltered.pgm", OUTPUT, dir->d_name); 
 
-        char epstr[16];
-        encontrarNome(inputFilename, epstr);
+        char ep_str[16];
+        encontrarNome(inputFilename, ep_str);
 
         struct Image img;
         readPGMImage(&img, inputFilename);
@@ -88,9 +83,11 @@ int main(int argc, char *argv[]) {
         snprintf(quantizadaFilename, sizeof(quantizadaFilename), "%s%squantizada.pgm", OUTPUT, dir->d_name); 
         snprintf(quantizadaFilename, sizeof(quantizadaFilename), "%s%squantizada_original.pgm", OUTPUT, dir->d_name); 
 
-        applyscm(&img_quantizada_original, &img_quantizada_filtrada, TAM_SCM, epstr, fptr);
+        unsigned char *scmMatriz = criarSCM(&img_quantizada_original, &img_quantizada_filtrada, TAM_SCM);
+        imprimirSCM(csv, scmMatriz, TAM_SCM, ep_str);
 
         free(img.Data);
+        free(scmMatriz);
         free(img_filtrada.Data);
         free(img_quantizada_original.Data);
         free(img_quantizada_filtrada.Data);
@@ -99,7 +96,7 @@ int main(int argc, char *argv[]) {
     closedir(d);
   }
 
-  fclose(fptr);
+  fclose(csv);
   clock_t fim = clock();
   double tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
   printf("Tempo: %f segundos\n", tempo);

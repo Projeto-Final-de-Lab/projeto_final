@@ -1,7 +1,8 @@
 #include "../lib/pgm.h"
 
-void filtro_media(struct Image *img, struct Image *out, int n);
-void quantizar(struct Image *img, struct Image *out, int N);
-void encontrarNome(char *nameinput, char *nameoutput);
-int applyscm(struct Image *img, struct Image *qtzd, int N, char *final, FILE *fptr);
-void writeCSVHeader(FILE *file, int quantizationLevels);
+void filtro_media(struct Image *, struct Image *, int);
+void quantizar(struct Image *, struct Image *, int);
+void encontrarNome(char *, char *);
+unsigned char* criarSCM(struct Image *, struct Image *, int);
+void imprimirSCM(FILE *, unsigned char *, int , char *);
+void writeCSVHeader(FILE *, int);

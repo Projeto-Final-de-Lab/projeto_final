@@ -88,26 +88,13 @@ void encontrarNome(char *nameinput, char *nameoutput){
   }
 }
 
-int applyscm(struct Image *img, struct Image *qtzd, int N, char *final, FILE *fptr){
+unsigned char* criarSCM(struct Image *img, struct Image *qtzd, int N){
+  unsigned char *scm = calloc(N * N, sizeof(unsigned char));
 
   // Verifica se os tamanhos das imagens são iguais
   if (img->height != qtzd->height || img->width != qtzd->width) {
-    printf("Erro: as imagens devem ter o mesmo tamanho\n");
+    printf("As imagens devem ter o mesmo tamanho\n");
     exit(1);
-  }
-
-  // Aloca memória para a matriz scm de tamanho N x N
-  int **scm = malloc(N * sizeof(int *));
-  if (scm == NULL) {
-    printf("Erro ao alocar memória para a matriz scm\n");
-    exit(1);
-  }
-  for (int i = 0; i < N; i++) {
-    scm[i] = calloc(N, sizeof(int));
-    if (scm[i] == NULL) {
-      printf("Erro ao alocar memória para a matriz scm\n");
-      exit(1);
-    }
   }
 
   // Calcula a matriz scm a partir dos valores dos pixels das imagens
@@ -117,24 +104,23 @@ int applyscm(struct Image *img, struct Image *qtzd, int N, char *final, FILE *fp
             int x = img->Data[i * img->width + j] * (N - 1) / 255;
             int y = qtzd->Data[i * qtzd->width + j] * (N - 1) / 255;
             // Incrementa a frequência do par (x, y) na matriz scm
-            scm[x][y]++;
+            scm[x*N+y]++;
         }
   }
 
-  // Escreve a matriz scm no arquivo separado por vírgulas
+  return scm;
+}
+
+void imprimirSCM(FILE *arquivo, unsigned char *scm, int N, char *final){
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < N; j++) {
-      fprintf(fptr, "%d, ", scm[i][j]);
+      fprintf(arquivo, "%d, ", scm[i*N+j]);
     }
   }
-  fprintf(fptr, "%s\n", final);
-
-  // Libera a memória da matriz scm
-  for (int i = 0; i < N; i++) {
-    free(scm[i]);
-  }
-  free(scm);
+  fprintf(arquivo, "%s\n", final);
 }
+
+
 
 void writeCSVHeader(FILE *file, int quantizationLevels) {
     // Escreve a primeira linha do arquivo CSV com a contagem de 0 até nivel*nivel
